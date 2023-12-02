@@ -17,35 +17,13 @@ public class VQCompress {
         Vector<Vector<Vector<Double>>> codeBook = new Vector<>();
         associated.add(blocks);
 
-        int ok = 0;
-
         Vector<Vector<Double>> avg;
-        while(true){
-            copy(associated, prev_associated);
-
+        while(codeBook.size() != 4){
             //Calculate average of blocks
             averages.clear();
             for(Vector<Vector<Vector<Double>>> v_block: associated){
                 avg = getAverage(v_block);
                 if(avg != null)averages.add(avg);
-            }
-
-            /*If it is not the first iteration try to associate blocks to the averages
-            * If the association to the averages is the same as the previous association
-            * Break
-            * Else Split*/
-            if(ok > 0){
-                copy(associated, prev_associated);
-                associated.clear();
-                for (int i = 0; i < averages.size(); i++) {
-                    associated.add(new Vector<>());
-                }
-                for (Vector<Vector<Double>> b : blocks) {
-                    int ind = match(b, averages);
-                    associated.get(ind).add(b);
-                }
-
-                if(areEqual(associated, prev_associated))break;
             }
 
             //Split the averages
@@ -70,8 +48,6 @@ public class VQCompress {
                         }
                     }
                 }
-
-
                 // Add v1 and v2 to the codeBook vector
                 codeBook.add(v1);
                 codeBook.add(v2);
@@ -86,10 +62,36 @@ public class VQCompress {
                 int ind = match(b, codeBook);
                 associated.get(ind).add(b);
             }
-
-            //Increment counter to know the iteration number
-            ok++;
         }
+        copy(associated, prev_associated);
+
+        //Calculate averages of produced codebook
+        averages.clear();
+        for(Vector<Vector<Vector<Double>>> v_block: associated){
+            avg = getAverage(v_block);
+            if(avg != null)averages.add(avg);
+        }
+
+        //Associate blocks to the averages
+        associated.clear();
+        for (int i = 0; i < averages.size(); i++) {
+            associated.add(new Vector<>());
+        }
+        for (Vector<Vector<Double>> b : blocks) {
+            int ind = match(b, averages);
+            associated.get(ind).add(b);
+        }
+
+        //If associate = prev_associate done
+        //Else calculate the average of the new associated blocks
+        if(!areEqual(associated, prev_associated)){
+            codeBook.clear();
+            for(Vector<Vector<Vector<Double>>> v_block: associated){
+                avg = getAverage(v_block);
+                if(avg != null)codeBook.add(avg);
+            }
+        }
+
         System.out.println(codeBook);
     }
     private Vector<Vector<Vector<Double>>> divideToBlocks(Vector<Vector<Double>> myImage){
@@ -204,24 +206,24 @@ public class VQCompress {
     }
 
     private int match(Vector<Vector<Double>> block, Vector<Vector<Vector<Double>>> codeBook){
-        int min = 10000, ret_ind = 0, cnt = 0;
+        double min = 10000, ret_ind = 0, cnt = 0;
         for (Vector<Vector<Double>> v: codeBook){
             if(v.get(0).get(0).isNaN()){
                 cnt++;
                 continue;
             }
-            int total = 0;
-            total += Math.pow((block.get(0).get(0) - v.get(0).get(0)), 2);
-            total += Math.pow((block.get(0).get(1) - v.get(0).get(1)), 2);
-            total += Math.pow((block.get(1).get(0) - v.get(1).get(0)), 2);
-            total += Math.pow((block.get(1).get(1) - v.get(1).get(1)), 2);
+            double total = 0;
+            total += Math.abs((block.get(0).get(0) - v.get(0).get(0)));
+            total += Math.abs((block.get(0).get(1) - v.get(0).get(1)));
+            total += Math.abs((block.get(1).get(0) - v.get(1).get(0)));
+            total += Math.abs((block.get(1).get(1) - v.get(1).get(1)));
             if(min > total){
                 min = total;
                 ret_ind = cnt;
             }
             cnt++;
         }
-        return ret_ind;
+        return (int)ret_ind;
     }
 
     private void copy(Vector<Vector<Vector<Vector<Double>>>> source, Vector<Vector<Vector<Vector<Double>>>> target) {
