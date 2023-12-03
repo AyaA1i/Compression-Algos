@@ -7,7 +7,6 @@ public class Writer {
     public void writeToBinFile(String outputFilePath, String result){
         try (FileWriter writer = new FileWriter(outputFilePath)) {
             writer.write(result);
-            writer.close();
         } catch (IOException e) {
             System.out.println("An error occurred while writing to the file.");
             e.printStackTrace();

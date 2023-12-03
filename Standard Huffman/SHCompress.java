@@ -24,7 +24,7 @@ public class SHCompress {
             Node left = pq.poll();
             Node right = pq.poll();
             assert right != null;
-            Node internalNode = new Node('\0', left.freq + right.freq);
+            Node internalNode = new Node('-', left.freq + right.freq);
             internalNode.right = right;
             internalNode.left = left;
             pq.add(internalNode);
@@ -75,8 +75,8 @@ public class SHCompress {
     }
     public void compress(Node root, String str, Map<Character, String> huffmanCode){
         if(root == null)return;
-        if (root.right == null && root.left == null) {
-            huffmanCode.put(root.ch, str.length() > 0 ? str : "1");
+        if (root.right == null && root.left == null && Character.isLetter(root.ch)) {
+            huffmanCode.put(root.ch, str);
         }
         compress(root.left, str + '0', huffmanCode);
         compress(root.right, str + '1', huffmanCode);

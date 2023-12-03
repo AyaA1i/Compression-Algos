@@ -3,5 +3,6 @@ public class Main {
         //GUI.createAndShowGUI();
         VectorQuantization vq = new VectorQuantization();
         vq.compress("inputC.txt", "outputC.txt");
+        vq.decompress("inputC.txt", "outputC.txt");
     }
 }
