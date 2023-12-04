@@ -7,7 +7,7 @@ import java.io.File;
 public class GUI{
     static VectorQuantization vectorQuantization = new VectorQuantization();
     public static void createAndShowGUI()  {
-        JFrame frame = new JFrame("Huffman Application");
+        JFrame frame = new JFrame("Vector Quantization Application");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(350, 450));
         frame.setLayout(new FlowLayout());
