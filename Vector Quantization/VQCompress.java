@@ -18,7 +18,7 @@ public class VQCompress {
         associated.add(blocks);
 
         Vector<Vector<Double>> avg;
-        while (codeBook.size() != 4) {
+        while (codeBook.size() != 8) {
             // Calculate average of blocks
             averages.clear();
             for (Vector<Vector<Vector<Double>>> v_block : associated) {

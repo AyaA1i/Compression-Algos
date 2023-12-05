@@ -5,7 +5,7 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 public class ImageVectorConverter {
-    public static Vector<Vector<Double>> imageTo2DVector(String imagePath) {
+    public static Vector<Vector<Integer>> imageTo2DVector(String imagePath) {
         try {
             // Read the image
             BufferedImage image = ImageIO.read(new File(imagePath));
@@ -15,22 +15,16 @@ public class ImageVectorConverter {
             int height = image.getHeight();
 
             // Create a 2D vector to store pixel values
-            Vector<Vector<Double>> pixelValues = new Vector<>(height);
+            Vector<Vector<Integer>> pixelValues = new Vector<>(height);
 
             // Iterate through each pixel and store its grayscale value
             for (int y = 0; y < height; y++) {
-                Vector<Double> row = new Vector<>(width);
+                Vector<Integer> row = new Vector<>(width);
                 for (int x = 0; x < width; x++) {
-                    int rgb = image.getRGB(x, y);
-                    int red = (rgb >> 16) & 0xFF;
-                    int green = (rgb >> 8) & 0xFF;
-                    int blue = rgb & 0xFF;
+                    int pixelValue = image.getRGB(x, y);
+                    int intensity = (pixelValue >> 16) & 0xFF;
 
-                    // Assuming grayscale image, use red channel
-                    double grayscaleValue = (red + green + blue) / 3.0;
-
-                    // Store the grayscale value in the row
-                    row.add(grayscaleValue);
+                    row.add(intensity);
                 }
                 // Add the row to the 2D vector
                 pixelValues.add(row);
@@ -48,7 +42,7 @@ public class ImageVectorConverter {
         int width = pixels.get(0).size();
         int height = pixels.size();
 
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {

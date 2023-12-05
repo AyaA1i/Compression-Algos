@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 public class VQDecompress {
-    Vector<Vector<Vector<Double>>> codeBook = new Vector<>();
+    Vector<Vector<Vector<Integer>>> codeBook = new Vector<>();
 
     public void decompress(String inputFilePath, String outputFilePath) throws IOException {
         String s = new Read_Write().readFromBinFile(inputFilePath);
@@ -20,17 +20,18 @@ public class VQDecompress {
             else if (i == 1)
                 c = s.charAt(i++);
             else if (i == 2) {
-                for (int j = i; j < 18; j += 4) {
-                    Vector<Vector<Double>> b = new Vector<>();
+                for (int j = i; j < 34; j += 4) {
+                    Vector<Vector<Integer>> b = new Vector<>();
                     b.add(new Vector<>());
                     b.add(new Vector<>());
-                    b.get(0).add((double) s.charAt(j));
-                    b.get(0).add((double) s.charAt(j + 1));
-                    b.get(1).add((double) s.charAt(j + 2));
-                    b.get(1).add((double) s.charAt(j + 3));
+                    b.get(0).add((int) s.charAt(j));
+                    b.get(0).add((int) s.charAt(j + 1));
+                    b.get(1).add((int) s.charAt(j + 2));
+                    b.get(1).add((int) s.charAt(j + 3));
                     codeBook.add(b);
                 }
-                i = 18;
+                System.out.println(codeBook);
+                i = 34;
             }
             else{
                 int p = s.charAt(i++);
@@ -39,11 +40,11 @@ public class VQDecompress {
                     compressed += String.format("%8s", Integer.toBinaryString(s.charAt(j))).replace(' ', '0');
                 }
                 compressed = compressed.substring(p);
-                Vector<Vector<Vector<Vector<Double>>>> image = new Vector<>();
+                Vector<Vector<Vector<Vector<Integer>>>> image = new Vector<>();
                 for (int j = 0; j < r/2; j++) {
                     image.add(new Vector<>(c/2));
                 }
-                for(Vector<Vector<Vector<Double>>> v: image){
+                for(Vector<Vector<Vector<Integer>>> v: image){
                     for (int j = 0; j < c/2; j++) {
                         int code = Integer.parseInt(compressed.charAt(0) + String.valueOf(compressed.charAt(1)), 2);
                         v.add(codeBook.get(code));
@@ -51,9 +52,9 @@ public class VQDecompress {
                     }
                 }
 
-                for(Vector<Vector<Vector<Double>>> v: image){
+                for(Vector<Vector<Vector<Integer>>> v: image){
                     String r1 = "", r2 = "";
-                    for (Vector<Vector<Double>> b: v) {
+                    for (Vector<Vector<Integer>> b: v) {
                         r1 += b.get(0).get(0) + " ";
                         r1 += b.get(0).get(1) + " ";
                         r2 += b.get(1).get(0) + " ";
