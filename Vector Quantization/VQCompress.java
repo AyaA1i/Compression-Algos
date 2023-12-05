@@ -4,13 +4,13 @@ public class VQCompress {
     public void compress(String inputFilePath, String outputFilePath) {
         String image = new Read_Write().readFromBinFile(inputFilePath);
 
-        //Convert String to Vector of Vectors
+        // Convert String to Vector of Vectors
         Vector<Vector<Double>> myImage = stringTo2d(image);
 
-        //Divide the image into 2×2 blocks
+        // Divide the image into 2×2 blocks
         Vector<Vector<Vector<Double>>> blocks = divideToBlocks(myImage);
 
-        //Create vector to hold the blocks created till now
+        // Create vector to hold the blocks created till now
         Vector<Vector<Vector<Vector<Double>>>> associated = new Vector<>();
         Vector<Vector<Vector<Vector<Double>>>> prev_associated = new Vector<>();
         Vector<Vector<Vector<Double>>> averages = new Vector<>();
@@ -19,17 +19,19 @@ public class VQCompress {
 
         Vector<Vector<Double>> avg;
         while (codeBook.size() != 4) {
-            //Calculate average of blocks
+            // Calculate average of blocks
             averages.clear();
             for (Vector<Vector<Vector<Double>>> v_block : associated) {
                 avg = getAverage(v_block);
-                if (avg != null) averages.add(avg);
+                if (avg != null)
+                    averages.add(avg);
             }
 
-            //Split the averages
+            // Split the averages
             codeBook.clear();
             for (Vector<Vector<Double>> v_avg : averages) {
-                if (v_avg == null) continue;
+                if (v_avg == null)
+                    continue;
                 // Create separate vectors for v1 and v2 in each iteration
                 Vector<Vector<Double>> v1 = new Vector<>();
                 Vector<Vector<Double>> v2 = new Vector<>();
@@ -52,7 +54,7 @@ public class VQCompress {
                 codeBook.add(v2);
             }
 
-            //try to associate blocks to the codebook
+            // try to associate blocks to the codebook
             associated.clear();
             for (int i = 0; i < codeBook.size(); i++) {
                 associated.add(new Vector<>());
@@ -64,14 +66,15 @@ public class VQCompress {
         }
         copy(associated, prev_associated);
 
-        //Calculate averages of produced codebook
+        // Calculate averages of produced codebook
         averages.clear();
         for (Vector<Vector<Vector<Double>>> v_block : associated) {
             avg = getAverage(v_block);
-            if (avg != null) averages.add(avg);
+            if (avg != null)
+                averages.add(avg);
         }
 
-        //Associate blocks to the averages
+        // Associate blocks to the averages
         associated.clear();
         for (int i = 0; i < averages.size(); i++) {
             associated.add(new Vector<>());
@@ -81,20 +84,22 @@ public class VQCompress {
             associated.get(ind).add(b);
         }
 
-        //If associate = prev_associate done
-        //Else calculate the average of the new associated blocks
+        // If associate = prev_associate done
+        // Else calculate the average of the new associated blocks
         if (!areEqual(associated, prev_associated)) {
             codeBook.clear();
             for (Vector<Vector<Vector<Double>>> v_block : associated) {
                 avg = getAverage(v_block);
-                if (avg != null) codeBook.add(avg);
+                if (avg != null)
+                    codeBook.add(avg);
             }
         }
 
         Vector<String> Labels = constructLabels(codeBook);
-        Vector<Vector<String>> CompressedImage =
-                constructCompressedImage(blocks, codeBook, Labels);
-        String compressedBin = convertToBinary(CompressedImage, codeBook, Labels);
+        String CompressedImage = constructCompressedImage(blocks, codeBook, Labels);
+        String compressedBin = convertToBinary(CompressedImage, codeBook, myImage.size(),
+                myImage.get(0).size());
+        System.out.println(codeBook);
         new Read_Write().writeToBinFile(outputFilePath, compressedBin);
     }
 
@@ -143,11 +148,12 @@ public class VQCompress {
     }
 
     private Vector<Vector<Double>> getAverage(Vector<Vector<Vector<Double>>> block) {
-        if (block == null) return null;
+        if (block == null)
+            return null;
         Vector<Vector<Double>> ret = new Vector<>();
         initialize(ret);
 
-        //Sum values
+        // Sum values
         for (Vector<Vector<Double>> v : block) {
             ret.get(0).set(0, ret.get(0).get(0) + v.get(0).get(0));
             ret.get(0).set(1, ret.get(0).get(1) + v.get(0).get(1));
@@ -165,8 +171,7 @@ public class VQCompress {
 
     private boolean areEqual(
             Vector<Vector<Vector<Vector<Double>>>> avg1,
-            Vector<Vector<Vector<Vector<Double>>>> avg2
-    ) {
+            Vector<Vector<Vector<Vector<Double>>>> avg2) {
         if (avg1.size() != avg2.size()) {
             return false;
         }
@@ -231,30 +236,26 @@ public class VQCompress {
     }
 
     private void copy(Vector<Vector<Vector<Vector<Double>>>> source, Vector<Vector<Vector<Vector<Double>>>> target) {
-        if (source == null) return;
+        if (source == null)
+            return;
 
         // Clear both target and target2
         target.clear();
 
         for (Vector<Vector<Vector<Double>>> outerVector : source) {
             Vector<Vector<Vector<Double>>> newOuterVector1 = new Vector<>();
-            Vector<Vector<Vector<Double>>> newOuterVector2 = new Vector<>();
 
             for (Vector<Vector<Double>> innerVector : outerVector) {
                 Vector<Vector<Double>> newInnerVector1 = new Vector<>();
-                Vector<Vector<Double>> newInnerVector2 = new Vector<>();
 
                 for (Vector<Double> doubleVector : innerVector) {
                     // Copy each inner vector for both target and target2
                     Vector<Double> newDoubleVector1 = new Vector<>(doubleVector);
-                    Vector<Double> newDoubleVector2 = new Vector<>(doubleVector);
 
                     newInnerVector1.add(newDoubleVector1);
-                    newInnerVector2.add(newDoubleVector2);
                 }
 
                 newOuterVector1.add(newInnerVector1);
-                newOuterVector2.add(newInnerVector2);
             }
 
             target.add(newOuterVector1);
@@ -283,63 +284,45 @@ public class VQCompress {
         return labels;
     }
 
-    private Vector<Vector<String>> constructCompressedImage(Vector<Vector<Vector<Double>>> blocks,
-                                                            Vector<Vector<Vector<Double>>> codeBook,
-                                                            Vector<String> Labels) {
-        Vector<Vector<String>> CompressedImage = new Vector<>();
-        Vector<String> temp = new Vector<>();
+    private String constructCompressedImage(Vector<Vector<Vector<Double>>> blocks,
+            Vector<Vector<Vector<Double>>> codeBook, Vector<String> Labels) {
+        String compressedImage = "";
         for (int i = 0; i < blocks.size(); i++) {
             Vector<Vector<Double>> block = blocks.get(i);
             int indx = match(block, codeBook);
-            temp.add(Labels.get(indx));
-            if (temp.size() == 3) {
-                Vector<String> temp2 = new Vector<>();
-                for (String j : temp) temp2.add(j);
-                CompressedImage.add(temp2);
-                temp.clear();
-            }
+            compressedImage += Labels.get(indx);
         }
-        return CompressedImage;
+        return compressedImage;
     }
 
-    private String convertToBinary(Vector<Vector<String>> CompressedImage,
-                                   Vector<Vector<Vector<Double>>> codeBook,
-                                   Vector<String> Labels) {
-        String compressedStream = "";
-        for (int i = 0; i < CompressedImage.size(); i++) {
-            for(int j = 0; j < CompressedImage.get(i).size();j++){
-                StringBuilder paddedString = new StringBuilder(CompressedImage.get(i).get(j));
-                while(paddedString.length() % 8 !=0){
-                    paddedString = new StringBuilder("0" + paddedString);
-                }
-                compressedStream += paddedString;
-            }
-        }
-        for (int i = 0; i < codeBook.size(); i++) {
-            for(int j = 0; j < codeBook.get(i).size();j++){
-                for(int k = 0;k < codeBook.get(i).get(j).size();k++){
-                    StringBuilder paddedString =
-                            new StringBuilder(String.format("%8s", Integer.toBinaryString((int) Math.round(codeBook.get(i).get(j).get(k)) & 0xFF)).replace(' ', '0'));
+    private String convertToBinary(String compressedImage, Vector<Vector<Vector<Double>>> codeBook, int rows, int cols) {
+        // format outputC : width height codebook paddingCI CI
 
-                    while(paddedString.length() % 8 !=0){
-                        paddedString = new StringBuilder("0" + paddedString);
-                    }
-                    compressedStream += paddedString;
+        String ret = "";
+
+        // Add width ans height
+        ret += (char) rows;
+        ret += (char) cols;
+
+        // Add codeBook
+        for (Vector<Vector<Double>> b : codeBook) {
+            for (Vector<Double> r : b) {
+                for (double num : r) {
+                    ret += (char) Math.round(num);
                 }
             }
-            StringBuilder paddedString =
-                    new StringBuilder(Labels.get(i));
-            while(paddedString.length() % 8 !=0){
-                paddedString = new StringBuilder("0" + paddedString);
-            }
-            compressedStream += paddedString;
         }
-        String storedString = "";
-        for(int i=0;i<compressedStream.length();i+=8){
-            storedString += (char)(Integer.parseInt(compressedStream.substring(i , i+8), 2));
+
+        // Add the Total length + padding zeros of compressed image + compressed image
+        int paddingCI = 0;
+        while (compressedImage.length() % 8 != 0) {
+            compressedImage = "0" + compressedImage;
+            paddingCI++;
         }
-        return storedString;
+        ret += (char) paddingCI;
+        for (int j = 0; j < compressedImage.length(); j += 8) {
+            ret += (char) Integer.parseInt(compressedImage.substring(j, j + 8), 2);
+        }
+        return ret;
     }
-
-
 }

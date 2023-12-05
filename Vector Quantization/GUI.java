@@ -3,17 +3,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
-public class GUI{
+public class GUI {
     static VectorQuantization vectorQuantization = new VectorQuantization();
-    public static void createAndShowGUI()  {
+
+    public static void createAndShowGUI() {
         JFrame frame = new JFrame("Vector Quantization Application");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(350, 450));
         frame.setLayout(new FlowLayout());
 
-        JTextField inputField = new JTextField("input.txt", 20);
-        JTextField outputField = new JTextField("output.txt", 20);
+        JTextField inputField = new JTextField("outputC.txt", 20);
+        JTextField outputField = new JTextField("outputD.txt", 20);
 
         JButton compressButton = new JButton("Compress");
         JButton decompressButton = new JButton("Decompress");
@@ -40,7 +42,11 @@ public class GUI{
                 String inputFile = inputField.getText();
                 String outputFile = outputField.getText();
                 if (fileExist(inputFile, outputFile)) {
-                    decompress(inputFile, outputFile);
+                    try {
+                        decompress(inputFile, outputFile);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 } else {
                     showError();
                 }
@@ -58,22 +64,21 @@ public class GUI{
         frame.setVisible(true);
     }
 
-    private static boolean fileExist(String inputFile, String outputFile){
+    private static boolean fileExist(String inputFile, String outputFile) {
         File file = new File(inputFile);
-        File file2 = new File(outputFile);
-        if(!file2.exists()){
-            File output = new File(outputFile);
-        }
         return file.exists();
     }
+
     private static void showError() {
         JOptionPane.showMessageDialog(null, "Input file does not exist.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+
     private static void compress(String inputFile, String outputFile) {
         vectorQuantization.compress(inputFile, outputFile);
         JOptionPane.showMessageDialog(null, "Compression completed.", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
-    private static void decompress(String inputFile, String outputFile) {
+
+    private static void decompress(String inputFile, String outputFile) throws IOException {
         vectorQuantization.decompress(inputFile, outputFile);
         JOptionPane.showMessageDialog(null, "Decompression completed.", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
