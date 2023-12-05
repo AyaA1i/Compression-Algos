@@ -14,8 +14,8 @@ public class GUI {
         frame.setPreferredSize(new Dimension(350, 450));
         frame.setLayout(new FlowLayout());
 
-        JTextField inputField = new JTextField("outputC.txt", 20);
-        JTextField outputField = new JTextField("outputD.txt", 20);
+        JTextField inputField = new JTextField("output.txt", 20);
+        JTextField outputField = new JTextField("output.txt", 20);
 
         JButton compressButton = new JButton("Compress");
         JButton decompressButton = new JButton("Decompress");

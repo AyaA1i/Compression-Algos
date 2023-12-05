@@ -18,7 +18,7 @@ public class VQCompress {
         associated.add(blocks);
 
         Vector<Vector<Double>> avg;
-        while (codeBook.size() != 8) {
+        while (codeBook.size() != 32) {
             // Calculate average of blocks
             averages.clear();
             for (Vector<Vector<Vector<Double>>> v_block : associated) {
@@ -285,7 +285,7 @@ public class VQCompress {
     }
 
     private String constructCompressedImage(Vector<Vector<Vector<Double>>> blocks,
-            Vector<Vector<Vector<Double>>> codeBook, Vector<String> Labels) {
+                                            Vector<Vector<Vector<Double>>> codeBook, Vector<String> Labels) {
         String compressedImage = "";
         for (int i = 0; i < blocks.size(); i++) {
             Vector<Vector<Double>> block = blocks.get(i);

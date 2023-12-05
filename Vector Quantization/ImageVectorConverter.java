@@ -41,16 +41,15 @@ public class ImageVectorConverter {
     public static BufferedImage convertToImage(Vector<Vector<Double>> pixels) {
         int width = pixels.get(0).size();
         int height = pixels.size();
-
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int grayValue = (int) (pixels.get(y).get(x) * 255);
-                image.getRaster().setSample(x, y, 0, grayValue);
+                int value = -1 << 24;
+                //1010 |
+                value = (int) (0xff000000 | (Math.round(pixels.get(y).get(x)) << 16) | (Math.round(pixels.get(y).get(x)) << 8) | Math.round((pixels.get(y).get(x))));
+                image.setRGB(x, y, value);
             }
         }
-
         return image;
     }
 }

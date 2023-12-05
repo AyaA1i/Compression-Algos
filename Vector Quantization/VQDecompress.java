@@ -20,7 +20,7 @@ public class VQDecompress {
             else if (i == 1)
                 c = s.charAt(i++);
             else if (i == 2) {
-                for (int j = i; j < 34; j += 4) {
+                for (int j = i; j < 130; j += 4) {
                     Vector<Vector<Integer>> b = new Vector<>();
                     b.add(new Vector<>());
                     b.add(new Vector<>());
@@ -31,7 +31,7 @@ public class VQDecompress {
                     codeBook.add(b);
                 }
                 System.out.println(codeBook);
-                i = 34;
+                i = 130;
             }
             else{
                 int p = s.charAt(i++);
@@ -46,9 +46,16 @@ public class VQDecompress {
                 }
                 for(Vector<Vector<Vector<Integer>>> v: image){
                     for (int j = 0; j < c/2; j++) {
-                        int code = Integer.parseInt(compressed.charAt(0) + String.valueOf(compressed.charAt(1)), 2);
+                        String cd = "";
+                        cd += compressed.charAt(0);
+                        cd += compressed.charAt(1);
+                        cd += compressed.charAt(2);
+                        cd += compressed.charAt(3);
+                        cd += compressed.charAt(4);
+
+                        int code = Integer.parseInt(cd, 2);
                         v.add(codeBook.get(code));
-                        compressed = compressed.substring(2);
+                        compressed = compressed.substring(5);
                     }
                 }
 

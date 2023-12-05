@@ -7,15 +7,15 @@ public class VectorQuantization {
     VectorQuantization() {
 //       int size = 6;
 //       image = "1 2 7 9 4 11\n3 4 6 6 12 12\n4 9 15 14 9 9\n10 10 20 18 8 8\n4 3 17 16 1 4\n4 5 18 18 5 6";
-         Vector<Vector<Integer>> img = ImageVectorConverter.imageTo2DVector("img.png");
-         for (int i = 0; i < img.size(); i++) {
+        Vector<Vector<Integer>> img = ImageVectorConverter.imageTo2DVector("img2.jpg");
+        for (int i = 0; i < img.size(); i++) {
             for (int j = 0; j < img.get(i).size(); j++) {
                 image += img.get(i).get(j);
                 if (j != img.get(i).size())
                     image += " ";
             }
             image += "\n";
-         }
+        }
     }
 
     public void compress(String inputFilePath, String outputFilePath) {
