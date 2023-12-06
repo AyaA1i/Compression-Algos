@@ -5,7 +5,8 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 public class ImageVectorConverter {
-    public static Vector<Vector<Integer>> imageTo2DVector(String imagePath) {
+    //
+    public static Vector<Vector<Vector<Integer>>>  imageTo2DVector(String imagePath) {
         try {
             // Read the image
             BufferedImage image = ImageIO.read(new File(imagePath));
@@ -15,22 +16,27 @@ public class ImageVectorConverter {
             int height = image.getHeight();
 
             // Create a 2D vector to store pixel values
-            Vector<Vector<Integer>> pixelValues = new Vector<>(height);
-
+            Vector<Vector<Vector<Integer>>>imagePixels = new Vector<>();
+            for (int i = 0; i < width; i++) {
+                imagePixels.add(new Vector<>());
+                for (int j = 0;j<height;j++){
+                    imagePixels.get(i).add(new Vector<>());
+                }
+            }
             // Iterate through each pixel and store its grayscale value
             for (int y = 0; y < height; y++) {
-                Vector<Integer> row = new Vector<>(width);
                 for (int x = 0; x < width; x++) {
                     int pixelValue = image.getRGB(x, y);
-                    int intensity = (pixelValue >> 16) & 0xFF;
-
-                    row.add(intensity);
+                    int red = (pixelValue >> 16) & 0xFF;
+                    int green = (pixelValue & 0x0000ff00) >> 8;
+                    int blue = pixelValue & 0x000000ff;
+                    imagePixels.get(y).get(x).add( red);
+                    imagePixels.get(y).get(x).add( green);
+                    imagePixels.get(y).get(x).add( blue);
                 }
-                // Add the row to the 2D vector
-                pixelValues.add(row);
             }
 
-            return pixelValues;
+            return imagePixels;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,7 +44,7 @@ public class ImageVectorConverter {
         }
     }
 
-    public static BufferedImage convertToImage(Vector<Vector<Double>> pixels) {
+    public static BufferedImage convertToImage(Vector<Vector<Vector<Double>>> pixels) {
         int width = pixels.get(0).size();
         int height = pixels.size();
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -46,7 +52,7 @@ public class ImageVectorConverter {
             for (int x = 0; x < width; x++) {
                 int value = -1 << 24;
                 //1010 |
-                value = (int) (0xff000000 | (Math.round(pixels.get(y).get(x)) << 16) | (Math.round(pixels.get(y).get(x)) << 8) | Math.round((pixels.get(y).get(x))));
+                value = (int) (0xff000000 | (Math.round(pixels.get(y).get(x).get(0)) << 16) | (Math.round(pixels.get(y).get(x).get(1)) << 8) | Math.round((pixels.get(y).get(x).get(2))));
                 image.setRGB(x, y, value);
             }
         }

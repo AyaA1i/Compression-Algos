@@ -1,11 +1,7 @@
 import java.util.Vector;
 
 public class VQCompress {
-    public void compress(String inputFilePath, String outputFilePath) {
-        String image = new Read_Write().readFromBinFile(inputFilePath);
-
-        // Convert String to Vector of Vectors
-        Vector<Vector<Double>> myImage = stringTo2d(image);
+    public void compress(Vector<Vector<Double>> myImage, String outputFilePath) {
 
         // Divide the image into 2×2 blocks
         Vector<Vector<Vector<Double>>> blocks = divideToBlocks(myImage);

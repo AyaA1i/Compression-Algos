@@ -7,11 +7,10 @@ import java.util.Vector;
 
 public class VQDecompress {
     Vector<Vector<Vector<Integer>>> codeBook = new Vector<>();
-
-    public void decompress(String inputFilePath, String outputFilePath) throws IOException {
+    public Vector<Vector<Double>> decompress(String inputFilePath) throws IOException {
         String s = new Read_Write().readFromBinFile(inputFilePath);
         // format outputC : width height codebook paddingCI CI
-
+        Vector<Vector<Double>> decompressed_img = new Vector<>();
         int i = 0, r = 0, c = 0;
         StringBuilder result = new StringBuilder();
         while (i < s.length()) {
@@ -20,6 +19,8 @@ public class VQDecompress {
             else if (i == 1)
                 c = s.charAt(i++);
             else if (i == 2) {
+                //32 * (4 (size of codebook)) = 128
+
                 for (int j = i; j < 130; j += 4) {
                     Vector<Vector<Integer>> b = new Vector<>();
                     b.add(new Vector<>());
@@ -30,7 +31,7 @@ public class VQDecompress {
                     b.get(1).add((int) s.charAt(j + 3));
                     codeBook.add(b);
                 }
-                System.out.println(codeBook);
+                //System.out.println(codeBook);
                 i = 130;
             }
             else{
@@ -74,7 +75,6 @@ public class VQDecompress {
                 }
                 result = new StringBuilder(result.toString().trim());
 
-                Vector<Vector<Double>> decompressed_img = new Vector<>();
                 String[] lines = String.valueOf(result).split("\n");
                 for (String line: lines) {
                     String[] num = line.split(" ");
@@ -83,13 +83,10 @@ public class VQDecompress {
                         decompressed_img.get(decompressed_img.size()-1).add(Double.valueOf(n));
                     }
                 }
-                BufferedImage bufferedImage = ImageVectorConverter.convertToImage(decompressed_img);
-                File output = new File("output.png");
-                ImageIO.write(bufferedImage, "png", output);
                 break;
             }
         }
-        new Read_Write().writeToBinFile(outputFilePath, result.toString());
+        return decompressed_img;
     }
 }
 

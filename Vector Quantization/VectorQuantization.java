@@ -1,3 +1,5 @@
+import javax.imageio.ImageIO;
+import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -5,28 +7,49 @@ public class VectorQuantization {
     String image = "";
 
     VectorQuantization() {
-//       int size = 6;
-//       image = "1 2 7 9 4 11\n3 4 6 6 12 12\n4 9 15 14 9 9\n10 10 20 18 8 8\n4 3 17 16 1 4\n4 5 18 18 5 6";
-        Vector<Vector<Integer>> img = ImageVectorConverter.imageTo2DVector("img2.jpg");
-        for (int i = 0; i < img.size(); i++) {
-            for (int j = 0; j < img.get(i).size(); j++) {
-                image += img.get(i).get(j);
-                if (j != img.get(i).size())
-                    image += " ";
-            }
-            image += "\n";
-        }
     }
 
     public void compress(String inputFilePath, String outputFilePath) {
         VQCompress vqCompress = new VQCompress();
         new Read_Write().writeToBinFile(inputFilePath, image);
-        vqCompress.compress(inputFilePath, outputFilePath);
+        Vector<Vector<Vector<Integer>>> img = ImageVectorConverter.imageTo2DVector("img2.jpg");
+        Vector<Vector<Double>> red = new Vector<>(), green = new Vector<>(), blue = new Vector<>();
+        for (int i = 0; i < img.size(); i++) {
+            red.add(new Vector<>());
+            green.add(new Vector<>());
+            blue.add(new Vector<>());
+            for (int j = 0;j<img.get(0).size();j++){
+                red.get(i).add(Double.valueOf(img.get(i).get(j).get(0)));
+                green.get(i).add(Double.valueOf(img.get(i).get(j).get(1)));
+                blue.get(i).add(Double.valueOf(img.get(i).get(j).get(2)));
+            }
+        }
+        vqCompress.compress(red, "red.txt");
+        vqCompress.compress(green, "green.txt");
+        vqCompress.compress(blue, "blue.txt");
     }
 
     public void decompress(String inputFilePath, String outputFilePath) throws IOException {
         VQDecompress vqDecompress = new VQDecompress();
-        vqDecompress.decompress(inputFilePath, outputFilePath);
+        Vector<Vector<Vector<Double>>>img = new Vector<>();
+        Vector<Vector<Double>> red = vqDecompress.decompress("red.txt")
+                , green = vqDecompress.decompress("green.txt"),
+                blue = vqDecompress.decompress("blue.txt");
+        for (int i = 0; i < red.size(); i++) {
+            img.add(new Vector<>());
+            for (int j = 0;j<red.get(0).size();j++){
+                img.get(i).add(new Vector<>());
+            }
+        }
+        for (int i = 0; i < red.size(); i++) {
+            for (int j = 0;j<red.get(0).size();j++){
+                img.get(i).get(j).add(red.get(i).get(j));
+                img.get(i).get(j).add(green.get(i).get(j));
+                img.get(i).get(j).add(blue.get(i).get(j));
+            }
+        }
+        File output = new File("output.png");
+        ImageIO.write(ImageVectorConverter.convertToImage(img), "png", output);
     }
 }
 // 2 3 8 9 4 10
