@@ -5,7 +5,6 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 public class ImageVectorConverter {
-    //
     public static Vector<Vector<Vector<Integer>>>  imageTo2DVector(String imagePath) {
         try {
             // Read the image
@@ -51,7 +50,6 @@ public class ImageVectorConverter {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int value = -1 << 24;
-                //1010 |
                 value = (int) (0xff000000 | (Math.round(pixels.get(y).get(x).get(0)) << 16) | (Math.round(pixels.get(y).get(x).get(1)) << 8) | Math.round((pixels.get(y).get(x).get(2))));
                 image.setRGB(x, y, value);
             }

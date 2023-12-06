@@ -1,13 +1,8 @@
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Vector;
 
 public class VQDecompress {
     Vector<Vector<Vector<Integer>>> codeBook = new Vector<>();
-    public Vector<Vector<Double>> decompress(String inputFilePath) throws IOException {
+    public Vector<Vector<Double>> decompress(String inputFilePath) {
         String s = new Read_Write().readFromBinFile(inputFilePath);
         // format outputC : width height codebook paddingCI CI
         Vector<Vector<Double>> decompressed_img = new Vector<>();
@@ -36,11 +31,11 @@ public class VQDecompress {
             }
             else{
                 int p = s.charAt(i++);
-                String compressed = "";
+                StringBuilder compressed = new StringBuilder();
                 for (int j = i; j < s.length(); j++) {
-                    compressed += String.format("%8s", Integer.toBinaryString(s.charAt(j))).replace(' ', '0');
+                    compressed.append(String.format("%8s", Integer.toBinaryString(s.charAt(j))).replace(' ', '0'));
                 }
-                compressed = compressed.substring(p);
+                compressed = new StringBuilder(compressed.substring(p));
                 Vector<Vector<Vector<Vector<Integer>>>> image = new Vector<>();
                 for (int j = 0; j < r/2; j++) {
                     image.add(new Vector<>(c/2));
@@ -56,17 +51,18 @@ public class VQDecompress {
 
                         int code = Integer.parseInt(cd, 2);
                         v.add(codeBook.get(code));
-                        compressed = compressed.substring(5);
+                        compressed = new StringBuilder(compressed.substring(5));
                     }
                 }
 
                 for(Vector<Vector<Vector<Integer>>> v: image){
-                    String r1 = "", r2 = "";
+                    StringBuilder r1 = new StringBuilder();
+                    StringBuilder r2 = new StringBuilder();
                     for (Vector<Vector<Integer>> b: v) {
-                        r1 += b.get(0).get(0) + " ";
-                        r1 += b.get(0).get(1) + " ";
-                        r2 += b.get(1).get(0) + " ";
-                        r2 += b.get(1).get(1) + " ";
+                        r1.append(b.get(0).get(0)).append(" ");
+                        r1.append(b.get(0).get(1)).append(" ");
+                        r2.append(b.get(1).get(0)).append(" ");
+                        r2.append(b.get(1).get(1)).append(" ");
                     }
                     result.append(r1);
                     result.append('\n');

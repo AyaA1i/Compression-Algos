@@ -95,7 +95,7 @@ public class VQCompress {
         String CompressedImage = constructCompressedImage(blocks, codeBook, Labels);
         String compressedBin = convertToBinary(CompressedImage, codeBook, myImage.size(),
                 myImage.get(0).size());
-        System.out.println(codeBook);
+
         new Read_Write().writeToBinFile(outputFilePath, compressedBin);
     }
 
@@ -117,20 +117,6 @@ public class VQCompress {
             }
         }
         return blocks;
-    }
-
-    private Vector<Vector<Double>> stringTo2d(String image) {
-        Vector<Vector<Double>> myImage = new Vector<>();
-        String[] rows = image.split("\n");
-        for (String row : rows) {
-            String[] numbers = row.split(" ");
-            Vector<Double> num = new Vector<>();
-            for (String str : numbers) {
-                num.add(Double.valueOf(str));
-            }
-            myImage.add(num);
-        }
-        return myImage;
     }
 
     private void initialize(Vector<Vector<Double>> v) {
@@ -261,20 +247,20 @@ public class VQCompress {
     private Vector<String> constructLabels(Vector<Vector<Vector<Double>>> codebook) {
         Vector<String> labels = new Vector<>();
         int sz = codebook.size();
-        int numOfbits = 0;
-        while (Math.pow(2, numOfbits) < sz) {
-            numOfbits++;
+        int numOfBits = 0;
+        while (Math.pow(2, numOfBits) < sz) {
+            numOfBits++;
         }
         for (int i = 0; i < sz; i++) {
             String label = Integer.toBinaryString(i);
-            int labelsz = label.length();
-            String temp = "";
-            while (labelsz < numOfbits) {
-                temp += "0";
-                labelsz++;
+            int labelSz = label.length();
+            StringBuilder temp = new StringBuilder();
+            while (labelSz < numOfBits) {
+                temp.append("0");
+                labelSz++;
             }
-            temp += label;
-            label = temp;
+            temp.append(label);
+            label = temp.toString();
             labels.add(label);
         }
         return labels;
@@ -282,43 +268,44 @@ public class VQCompress {
 
     private String constructCompressedImage(Vector<Vector<Vector<Double>>> blocks,
                                             Vector<Vector<Vector<Double>>> codeBook, Vector<String> Labels) {
-        String compressedImage = "";
-        for (int i = 0; i < blocks.size(); i++) {
-            Vector<Vector<Double>> block = blocks.get(i);
-            int indx = match(block, codeBook);
-            compressedImage += Labels.get(indx);
+        StringBuilder compressedImage = new StringBuilder();
+        for (Vector<Vector<Double>> block : blocks) {
+            int ind = match(block, codeBook);
+            compressedImage.append(Labels.get(ind));
         }
-        return compressedImage;
+        return compressedImage.toString();
     }
 
     private String convertToBinary(String compressedImage, Vector<Vector<Vector<Double>>> codeBook, int rows, int cols) {
         // format outputC : width height codebook paddingCI CI
 
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
 
         // Add width ans height
-        ret += (char) rows;
-        ret += (char) cols;
+        ret.append((char) rows);
+        ret.append((char) cols);
 
         // Add codeBook
         for (Vector<Vector<Double>> b : codeBook) {
             for (Vector<Double> r : b) {
                 for (double num : r) {
-                    ret += (char) Math.round(num);
+                    ret.append((char) Math.round(num));
                 }
             }
         }
 
         // Add the Total length + padding zeros of compressed image + compressed image
         int paddingCI = 0;
-        while (compressedImage.length() % 8 != 0) {
-            compressedImage = "0" + compressedImage;
+        StringBuilder compressedImageBuilder = new StringBuilder(compressedImage);
+        while (compressedImageBuilder.length() % 8 != 0) {
+            compressedImageBuilder.insert(0, "0");
             paddingCI++;
         }
-        ret += (char) paddingCI;
+        compressedImage = compressedImageBuilder.toString();
+        ret.append((char) paddingCI);
         for (int j = 0; j < compressedImage.length(); j += 8) {
-            ret += (char) Integer.parseInt(compressedImage.substring(j, j + 8), 2);
+            ret.append((char) Integer.parseInt(compressedImage.substring(j, j + 8), 2));
         }
-        return ret;
+        return ret.toString();
     }
 }
