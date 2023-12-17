@@ -66,7 +66,7 @@ public class GUI {
     }
 
     private static void decompress(String outputFile) throws IOException {
-        vectorQuantization.decompress(outputFile);
+//        vectorQuantization.decompress(outputFile);
         JOptionPane.showMessageDialog(null, "Decompression completed.", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 }

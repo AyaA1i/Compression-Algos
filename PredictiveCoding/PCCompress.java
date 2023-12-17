@@ -1,42 +1,109 @@
 import java.util.Vector;
 
 public class PCCompress {
-    public void compress(Vector<Vector<Double>> myImage, String outputFilePath) {
-        Vector<Vector<Double>> predicted = new Vector<>();
-        Vector<Vector<Double>> diff = new Vector<>();
-        predicted = generatePredicted(myImage);
-        diff = generateDifference(myImage , predicted);
+    Vector<Vector<Integer>> predicted = new Vector<>();
+    Vector<Vector<Integer>> diff = new Vector<>();
+    Vector<Vector<Integer>> quantizedDiff = new Vector<>();
+    Vector<Vector<Integer>> decoded = new Vector<>();
+    Vector<Vector<Integer>> original;
 
+    public PCCompress() {
     }
 
-    private Vector<Vector<Double>> generatePredicted(Vector<Vector<Double>> myImage) {
-        Vector<Vector<Double>> predicted = new Vector<>();
-        for (int x = 0; x < myImage.size(); x++) {
+    public void compress(Vector<Vector<Integer>> original ,String outputFilePath) {
+        this.original = original;
+        for (int x = 0; x < original.size(); x++) {
+            decoded.add(new Vector<>());
+            diff.add(new Vector<>());
+            quantizedDiff.add(new Vector<>());
             predicted.add(new Vector<>());
-            for (int y = 0; y < myImage.get(x).size(); y++) {
-                if (x - 1 >= 0 && y - 1 >= 0) {
-                    predicted.get(x).add((myImage.get(x - 1).get(y) + myImage.get(x).get(y - 1))/2);
-                } else {
-                    predicted.get(x).add((myImage.get(x).get(y)));
+            for (int y = 0; y < original.get(x).size(); y++) {
+                if (x == 0 || y == 0) {
+                    decoded.get(x).add(original.get(x).get(y));
+                    diff.get(x).add(original.get(x).get(y));
+                    quantizedDiff.get(x).add(original.get(x).get(y));
+                    predicted.get(x).add(original.get(x).get(y));
                 }
             }
         }
-        return predicted;
-    }
-
-    private Vector<Vector<Double>> generateDifference(Vector<Vector<Double>> myImage, Vector<Vector<Double>> predicted) {
-        Vector<Vector<Double>> diff = new Vector<>();
-        for (int x = 0; x < myImage.size(); x++) {
-            diff.add(new Vector<>());
-            for (int y = 0; y < myImage.get(x).size(); y++) {
-                diff.get(x).add((myImage.get(x).get(y) - predicted.get(x).get(y)));
+        for (int x = 1; x < original.size(); x++) {
+            for (int y = 1; y < original.get(x).size(); y++) {
+                generatePredicted(x, y);
+                generateDifference(x, y);
+                generateQuantizedDifference(x, y);
+                generateDequantizedDifference(x, y);
+                generateDecoded(x, y);
             }
         }
-        return diff;
+//        System.out.println(original);
+//        System.out.println(predicted);
+//        System.out.println(diff);
+//        System.out.println(quantizedDiff);
+//        System.out.println(decoded);
+
     }
 
-    private void generateQuantizedDifference() {
+    private void generatePredicted(int x, int y) {
+        if (x - 1 >= 0 && y - 1 >= 0) {
+            int A = decoded.get(x).get(y - 1);
+            int B = decoded.get(x - 1).get(y - 1);
+            int C = decoded.get(x - 1).get(y);
+            if (B <= Math.min(A, C)) {
+                predicted.get(x).add(Math.max(C, A));
+            } else if (B >= Math.max(A, C)) {
+                predicted.get(x).add(Math.min(C, A));
+            } else {
+                predicted.get(x).add(A + C - B);
+            }
+        } else {
+            predicted.get(x).add((decoded.get(x).get(y)));
+        }
+    }
+
+    private void generateDifference(int x, int y) {
+        diff.get(x).add( original.get(x).get(y) - predicted.get(x).get(y));
+    }
+
+    private void generateQuantizedDifference(int x, int y) {
+        int num = diff.get(x).get(y);
+        int current = 0;
+        for (int i = -255; i <= 255; i += 8) {
+            if (num >= i && num < (i + 8)) {
+                quantizedDiff.get(x).add( current);
+                break;
+            }
+            current++;
+        }
+    }
+
+    private void generateDequantizedDifference(int x, int y) {
+        int num = quantizedDiff.get(x).get(y);
+        int current = 0;
+        for (int i = -255; i <= 255; i += 8) {
+            if (current == num) {
+                int r = i+7;
+                decoded.get(x).add( ((r + i) / 2));
+                break;
+            }
+            current++;
+        }
+    }
+
+    private void generateDecoded(int x, int y) {
+        if (x - 1 >= 0 && y - 1 >= 0) {
+            int A = decoded.get(x).get(y - 1);
+            int B = decoded.get(x - 1).get(y - 1);
+            int C = decoded.get(x - 1).get(y);
+            if (B <= Math.min(A, C)) {
+                decoded.get(x).set(y, Math.max(C, A) + decoded.get(x).get(y));
+            } else if (B >= Math.max(A, C)) {
+                decoded.get(x).set(y, Math.min(C, A) + decoded.get(x).get(y));
+            } else {
+                decoded.get(x).set(y, (A + C - B) + decoded.get(x).get(y));
+            }
+        }
 
     }
+
 
 }
