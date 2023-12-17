@@ -8,6 +8,7 @@ public class PCCompress {
     Vector<Vector<Integer>> original;
     public void compress(Vector<Vector<Integer>> original ,String outputFilePath) {
         this.original = original;
+        quantizedDiff.clear();
         for (int x = 0; x < original.size(); x++) {
             decoded.add(new Vector<>());
             diff.add(new Vector<>());

@@ -27,14 +27,13 @@ public class PCDecompress {
                 }
             }
         }
-        for (int x = 1; x < 49; x++) {
-            for (int y = 1; y < 49; y++) {
+        for (int x = 1; x < quantizedDiff.size(); x++) {
+            for (int y = 1; y < quantizedDiff.get(0).size(); y++) {
                 generateDequantizedDifference(x, y);
                 generateDecoded(x, y);
             }
         }
-        System.out.println(decoded);
-        return quantizedDiff;
+        return decoded;
     }
     private void generateDequantizedDifference(int x, int y) {
         int num = quantizedDiff.get(x).get(y);
@@ -61,7 +60,6 @@ public class PCDecompress {
                 decoded.get(x).set(y, (A + C - B) + decoded.get(x).get(y));
             }
         }
-
     }
 }
 
