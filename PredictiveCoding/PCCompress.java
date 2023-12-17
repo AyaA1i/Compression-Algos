@@ -6,10 +6,6 @@ public class PCCompress {
     Vector<Vector<Integer>> quantizedDiff = new Vector<>();
     Vector<Vector<Integer>> decoded = new Vector<>();
     Vector<Vector<Integer>> original;
-
-    public PCCompress() {
-    }
-
     public void compress(Vector<Vector<Integer>> original ,String outputFilePath) {
         this.original = original;
         for (int x = 0; x < original.size(); x++) {
@@ -35,12 +31,14 @@ public class PCCompress {
                 generateDecoded(x, y);
             }
         }
-//        System.out.println(original);
-//        System.out.println(predicted);
-//        System.out.println(diff);
-//        System.out.println(quantizedDiff);
-//        System.out.println(decoded);
-
+        StringBuilder result = new StringBuilder();
+        for(Vector<Integer> v: quantizedDiff){
+            for (Integer i: v){
+                result.append(i).append(" ");
+            }
+            result.append('\n');
+        }
+        new Read_Write().writeToBinFile(outputFilePath, result.toString());
     }
 
     private void generatePredicted(int x, int y) {
@@ -104,6 +102,4 @@ public class PCCompress {
         }
 
     }
-
-
 }

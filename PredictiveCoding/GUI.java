@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class GUI {
-    static PredictiveCoding vectorQuantization = new PredictiveCoding();
+    static PredictiveCoding predictiveCoding = new PredictiveCoding();
 
     public static void createAndShowGUI() {
         JFrame frame = new JFrame("Vector Quantization Application");
@@ -61,12 +61,12 @@ public class GUI {
     }
 
     private static void compress(String inputFile) {
-        vectorQuantization.compress(inputFile);
+        predictiveCoding.compress(inputFile);
         JOptionPane.showMessageDialog(null, "Compression completed.", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private static void decompress(String outputFile) throws IOException {
-//        vectorQuantization.decompress(outputFile);
+    private static void decompress(String inputFile) throws IOException {
+        predictiveCoding.decompress(inputFile);
         JOptionPane.showMessageDialog(null, "Decompression completed.", "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 }

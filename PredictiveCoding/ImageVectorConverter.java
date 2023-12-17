@@ -5,16 +5,13 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 public class ImageVectorConverter {
-    public static Vector<Vector<Vector<Integer>>>  imageTo2DVector(String imagePath) {
+    public static Vector<Vector<Vector<Integer>>> imageTo2DVector(String imagePath) {
         try {
             // Read the image
             BufferedImage image = ImageIO.read(new File(imagePath));
-
             // Get image dimensions
             int width = image.getWidth();
             int height = image.getHeight();
-
-            // Create a 2D vector to store pixel values
             Vector<Vector<Vector<Integer>>>imagePixels = new Vector<>();
             for (int i = 0; i < width; i++) {
                 imagePixels.add(new Vector<>());
@@ -22,7 +19,6 @@ public class ImageVectorConverter {
                     imagePixels.get(i).add(new Vector<>());
                 }
             }
-            // Iterate through each pixel and store its grayscale value
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     int pixelValue = image.getRGB(x, y);
@@ -34,16 +30,14 @@ public class ImageVectorConverter {
                     imagePixels.get(y).get(x).add( blue);
                 }
             }
-
             return imagePixels;
-
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public static BufferedImage convertToImage(Vector<Vector<Vector<Double>>> pixels) {
+    public static BufferedImage convertToImage(Vector<Vector<Vector<Integer>>> pixels) {
         int width = pixels.get(0).size();
         int height = pixels.size();
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
