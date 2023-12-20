@@ -7,18 +7,17 @@ public class PCDecompress {
         quantizedDiff.clear();
         decoded.clear();
         String s = new Read_Write().readFromBinFile(inputFilePath);
-        String[] lines = s.split("\n");
-        for(int i = 0;i < lines.length; i++){
+        int size = s.charAt(0);
+        for (int i = 0;i < size;i++){
             quantizedDiff.add(new Vector<>());
-            String[] nums = lines[i].split(" ");
-            for (String n: nums) {
-                if(n.charAt(n.length() -1) == '\r'){
-                    n = n.substring(0, n.length()-1);
-                }
-                quantizedDiff.get(i).add(Integer.parseInt(n));
-            }
         }
-        //System.out.println(quantizedDiff);
+        int ind = 0;
+        for (int i = 1; i < s.length(); i += size){
+            for (int j = i; j < i + size;j++){
+                quantizedDiff.get(ind).add((int) s.charAt(j));
+            }
+            ind++;
+        }
         for (int x = 0; x < quantizedDiff.size(); x++) {
             decoded.add(new Vector<>());
             for (int y = 0; y < quantizedDiff.get(x).size(); y++) {

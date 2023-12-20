@@ -9,6 +9,7 @@ public class PCCompress {
     public void compress(Vector<Vector<Integer>> original ,String outputFilePath) {
         this.original = original;
         quantizedDiff.clear();
+        decoded.clear();
         for (int x = 0; x < original.size(); x++) {
             decoded.add(new Vector<>());
             diff.add(new Vector<>());
@@ -33,15 +34,14 @@ public class PCCompress {
             }
         }
         StringBuilder result = new StringBuilder();
+        result.append(Character.toChars(original.size()));
         for(Vector<Integer> v: quantizedDiff){
             for (Integer i: v){
-                result.append(i).append(" ");
+                result.append(Character.toChars(i));
             }
-            result.append('\n');
         }
         new Read_Write().writeToBinFile(outputFilePath, result.toString());
     }
-
     private void generatePredicted(int x, int y) {
         if (x - 1 >= 0 && y - 1 >= 0) {
             int A = decoded.get(x).get(y - 1);
@@ -58,11 +58,9 @@ public class PCCompress {
             predicted.get(x).add((decoded.get(x).get(y)));
         }
     }
-
     private void generateDifference(int x, int y) {
         diff.get(x).add( original.get(x).get(y) - predicted.get(x).get(y));
     }
-
     private void generateQuantizedDifference(int x, int y) {
         int num = diff.get(x).get(y);
         int current = 0;
@@ -74,7 +72,6 @@ public class PCCompress {
             current++;
         }
     }
-
     private void generateDequantizedDifference(int x, int y) {
         int num = quantizedDiff.get(x).get(y);
         int current = 0;
@@ -87,7 +84,6 @@ public class PCCompress {
             current++;
         }
     }
-
     private void generateDecoded(int x, int y) {
         if (x - 1 >= 0 && y - 1 >= 0) {
             int A = decoded.get(x).get(y - 1);
